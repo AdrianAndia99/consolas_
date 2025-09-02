@@ -1,24 +1,24 @@
 {
     "version": 1,
-    "name": "PlayerController 2",
+    "name": "PlayerController 3",
     "maps": [
         {
             "name": "Player",
             "id": "723947ac-0f80-42f6-83bd-6689606e794d",
             "actions": [
                 {
-                    "name": "RotationSpell",
+                    "name": "Movement",
                     "type": "Button",
-                    "id": "09035023-d65c-48ef-a897-2b0c988ed6ef",
+                    "id": "8f590f0a-9b92-4f4e-a29a-a31c5b707fef",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Shoot",
+                    "name": "Rotation",
                     "type": "Button",
-                    "id": "188651e8-306c-4c60-9045-ca5438778478",
+                    "id": "27e8cc25-b57a-4759-ae16-f4fdef490665",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -28,47 +28,69 @@
             "bindings": [
                 {
                     "name": "1D Axis",
-                    "id": "451f66f2-da12-45ad-afcb-b11558b6f92d",
+                    "id": "31d3c29d-e304-4a24-8eab-faa0b8f62806",
                     "path": "1DAxis",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "RotationSpell",
+                    "action": "Movement",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "negative",
-                    "id": "653e8a81-83e5-4253-b8a1-4d5ac7786fb5",
-                    "path": "<Gamepad>/leftShoulder",
+                    "id": "34df8651-9579-493f-ae68-8e7574e4cff1",
+                    "path": "<Gamepad>/leftStick/down",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "RotationSpell",
+                    "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
                 {
                     "name": "positive",
-                    "id": "c8b703a7-dc9f-4676-8b54-cc2de9f8be41",
-                    "path": "<Gamepad>/rightShoulder",
+                    "id": "1770bec9-cf4d-4e81-91e4-2a2f3c7a780b",
+                    "path": "<Gamepad>/leftStick/up",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "RotationSpell",
+                    "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
                 {
-                    "name": "",
-                    "id": "e2e3b214-35eb-4637-9602-b28e1786cac6",
-                    "path": "<XInputController>/buttonWest",
+                    "name": "1D Axis",
+                    "id": "8ec39c3e-a9e6-4975-9b9c-d3a93f1522d4",
+                    "path": "1DAxis",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Shoot",
-                    "isComposite": false,
+                    "action": "Rotation",
+                    "isComposite": true,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "5fac23b4-a947-4771-81cc-392655704680",
+                    "path": "<Gamepad>/leftStick/left",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Rotation",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "5dcc54fe-9bb6-420f-8216-e8c553a24478",
+                    "path": "<Gamepad>/leftStick/right",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Rotation",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }
