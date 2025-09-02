@@ -516,6 +516,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6979233681915739001, guid: 15ce35e32eea79d4888c47aa3e4154af,
         type: 3}
+      propertyPath: WinScene
+      value: WinScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 6979233681915739001, guid: 15ce35e32eea79d4888c47aa3e4154af,
+        type: 3}
+      propertyPath: LoseScene
+      value: LoseScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 6979233681915739001, guid: 15ce35e32eea79d4888c47aa3e4154af,
+        type: 3}
       propertyPath: rotationSpeed
       value: 260
       objectReference: {fileID: 0}

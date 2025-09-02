@@ -24,7 +24,7 @@ public class ShootPlayerController : MonoBehaviour
             var gamepads = Gamepad.all;
             if (gamepads.Count >= 2)
             {
-                
+
                 playerInput.SwitchCurrentControlScheme("Gamepad", gamepads[1]);
                 Debug.Log("Segundo mando asignado al jugador 2");
             }

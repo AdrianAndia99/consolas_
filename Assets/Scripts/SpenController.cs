@@ -26,7 +26,7 @@ public class SpenController : MonoBehaviour
         var gamepads = Gamepad.all;
         if (gamepads.Count >= 2 && playerInput != null)
         {
-           
+
             secondGamepad = gamepads[1];
             playerInput.SwitchCurrentControlScheme("Gamepad", secondGamepad);
             Debug.Log("Segundo mando asignado para rotación: " + secondGamepad.name);
@@ -38,7 +38,7 @@ public class SpenController : MonoBehaviour
         Direction = context.ReadValue<float>();
     }
 
-  
+
     public void CheckGamepadConnection()
     {
         if (secondGamepad == null || !secondGamepad.added)
