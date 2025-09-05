@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Unity.FPS.AI;
 using UnityEngine;
@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance;
 
     [Header("Game Settings")]
     public float matchTime = 180f;
@@ -51,33 +50,75 @@ public class GameManager : MonoBehaviour
     private List<PlayerController> activePlayers = new List<PlayerController>();
     private List<PlayerController> eliminatedPlayers = new List<PlayerController>();
 
-    void Awake()
+
+
+    // NUEVO MÉTODO: Se llama cuando una escena se carga
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (Instance == null)
+        Debug.Log($"Escena cargada: {scene.name}");
+        ResetGameState();
+    }
+
+    // NUEVO MÉTODO: Reiniciar el estado del juego
+    void ResetGameState()
+    {
+        Debug.Log("Reiniciando estado del juego");
+
+        // Limpiar todas las listas
+        activePlayers.Clear();
+        eliminatedPlayers.Clear();
+        activeEnemies.Clear();
+
+        // Reiniciar variables de estado
+        currentTime = matchTime;
+        currentScore = 0;
+        enemiesDestroyed = 0;
+        totalEnemies = 0;
+        gameEnded = false;
+
+        // Ocultar paneles de eliminación
+        HideAllEliminatedPanels();
+
+        // Ocultar panel de game over
+        if (gameOverPanel != null)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            gameOverPanel.SetActive(false);
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+
+        Debug.Log("Estado del juego reiniciado");
+        UpdateUI();
     }
 
     void Start()
     {
+        // Buscar jugadores existentes al inicio
+        FindExistingPlayers();
         currentTime = matchTime;
         UpdateUI();
-
-        PlayerController.OnPlayerInstantiated += OnPlayerInstantiated;
         StartCoroutine(SpawnEnemiesCoroutine());
         StartCoroutine(ScoreOverTimeCoroutine());
     }
-
+    void FindExistingPlayers()
+    {
+        // REEMPLAZA con el nuevo método no obsoleto
+        PlayerController[] players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+        foreach (PlayerController player in players)
+        {
+            OnPlayerInstantiated(player);
+        }
+    }
     void OnDestroy()
     {
+        Debug.Log("GameManager destruyéndose");
         PlayerController.OnPlayerInstantiated -= OnPlayerInstantiated;
+        UnsubscribeAllPlayers();
 
+        // Desuscribir del evento de escena
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void UnsubscribeAllPlayers()
+    {
         foreach (PlayerController player in activePlayers)
         {
             if (player != null)
@@ -85,6 +126,7 @@ public class GameManager : MonoBehaviour
                 player.OnLifeChanged -= OnPlayerLifeChanged;
             }
         }
+        activePlayers.Clear();
     }
 
     void Update()
@@ -107,27 +149,61 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void OnPlayerInstantiated(PlayerController player)
+    public void OnPlayerInstantiated(PlayerController player)
     {
-        activePlayers.Add(player);
+        Debug.Log($"Jugador {player.playerNumber} instanciado");
+
+        // Limpiar jugadores null o duplicados
+        activePlayers.RemoveAll(p => p == null || p == player);
+
+        // Desuscribir primero por si ya estaba suscrito
+        player.OnLifeChanged -= OnPlayerLifeChanged;
+
+        // Suscribir al evento de vida
         player.OnLifeChanged += OnPlayerLifeChanged;
         player.useGameManager = true;
 
-        // Asignar n�mero de jugador
-        if (activePlayers.Count == 1)
+        // Asignar número de jugador si no tiene o está duplicado
+        if (player.playerNumber == 0 || PlayerNumberExists(player.playerNumber))
         {
-            player.playerNumber = 1;
-        }
-        else if (activePlayers.Count == 2)
-        {
-            player.playerNumber = 2;
+            player.playerNumber = GetNextAvailablePlayerNumber();
         }
 
+        activePlayers.Add(player);
+
+        Debug.Log($"Jugador {player.playerNumber} agregado. Total: {activePlayers.Count}");
         UpdateUI();
+    }
+
+    // NUEVO MÉTODO: Verificar si un número de jugador ya existe
+    bool PlayerNumberExists(int playerNumber)
+    {
+        foreach (PlayerController p in activePlayers)
+        {
+            if (p != null && p.playerNumber == playerNumber)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // NUEVO MÉTODO: Obtener el siguiente número de jugador disponible
+    int GetNextAvailablePlayerNumber()
+    {
+        for (int i = 1; i <= 2; i++)
+        {
+            if (!PlayerNumberExists(i))
+            {
+                return i;
+            }
+        }
+        return 1; // Fallback
     }
 
     void OnPlayerLifeChanged(float newLife)
     {
+        Debug.Log($"Evento OnPlayerLifeChanged recibido: {newLife}");
         UpdateUI();
     }
 
@@ -135,18 +211,13 @@ public class GameManager : MonoBehaviour
     {
         if (!eliminatedPlayers.Contains(player))
         {
+            Debug.Log($"Jugador {player.playerNumber} eliminado");
             eliminatedPlayers.Add(player);
             ShowEliminatedPanel(player.playerNumber);
 
-            // Verificar si el juego debe terminar
             if (eliminatedPlayers.Count >= activePlayers.Count)
             {
                 EndGame(false);
-            }
-            else
-            {
-                // Juego contin�a con un jugador
-                Debug.Log($"Jugador {player.playerNumber} eliminado. El juego contin�a.");
             }
         }
     }
@@ -221,7 +292,12 @@ public class GameManager : MonoBehaviour
 
     void UpdateUI()
     {
-        // Tiempo (igual para ambos jugadores)
+        // Limpiar jugadores null antes de actualizar UI
+        activePlayers.RemoveAll(p => p == null);
+
+        Debug.Log($"UpdateUI - Jugadores activos: {activePlayers.Count}");
+
+        // Tiempo
         string timeString = $"Tiempo: {Mathf.FloorToInt(currentTime / 60f):00}:{Mathf.FloorToInt(currentTime % 60f):00}";
         if (timeTextP1 != null) timeTextP1.text = timeString;
         if (timeTextP2 != null) timeTextP2.text = timeString;
@@ -235,12 +311,13 @@ public class GameManager : MonoBehaviour
         if (enemiesTextP1 != null) enemiesTextP1.text = enemiesString;
         if (enemiesTextP2 != null) enemiesTextP2.text = enemiesString;
 
-        // Salud por jugador
+        // Salud
         foreach (PlayerController player in activePlayers)
         {
             if (player != null)
             {
-                string healthString = $"Salud: {player.Life}";
+                string healthString = $"Salud: {Mathf.RoundToInt(player.Life)}";
+
                 if (player.playerNumber == 1 && healthTextP1 != null)
                 {
                     healthTextP1.text = healthString;
@@ -251,6 +328,22 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+
+        // Para jugadores que no existen
+        if (healthTextP1 != null && !PlayerExists(1)) healthTextP1.text = "Salud: 0";
+        if (healthTextP2 != null && !PlayerExists(2)) healthTextP2.text = "Salud: 0";
+    }
+
+    bool PlayerExists(int playerNumber)
+    {
+        foreach (PlayerController player in activePlayers)
+        {
+            if (player != null && player.playerNumber == playerNumber)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     void EndGame(bool isVictory)
@@ -258,11 +351,12 @@ public class GameManager : MonoBehaviour
         if (gameEnded) return;
 
         gameEnded = true;
+        Debug.Log(isVictory ? "VICTORIA" : "DERROTA");
 
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
-            gameOverText.text = isVictory ? "�VICTORIA!" : "DERROTA";
+            gameOverText.text = isVictory ? "ˇVICTORIA!" : "DERROTA";
         }
 
         foreach (GameObject enemy in activeEnemies)
@@ -281,7 +375,6 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         SceneManager.LoadScene(sceneName);
-        Destroy(gameObject);
     }
 
     public void RestartGame()
@@ -289,6 +382,5 @@ public class GameManager : MonoBehaviour
         HideAllEliminatedPanels();
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        Destroy(gameObject);
     }
 }

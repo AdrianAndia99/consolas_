@@ -16,18 +16,31 @@ public class PlayerController : MonoBehaviour
     public GameObject[] leftWheels;
     public GameObject[] rightWheels;
     public int playerNumber = 0;
-    public float Life = 10;
-    public float maxLife = 10;
+
+    // Cambiamos a propiedad con backing field
+    private float _life = 10f;
+    public float Life
+    {
+        get => _life;
+        set
+        {
+            _life = Mathf.Clamp(value, 0, maxLife);
+            Debug.Log($"Jugador {playerNumber} - Vida cambiada a: {_life}");
+            OnLifeChanged?.Invoke(_life);
+        }
+    }
+
+    public float maxLife = 10f;
     public float wheelRotationSpeed = 200.0f;
     private float moveInput;
     private float rotationInput;
 
     [Header("Scene Management")]
-    public string winSceneName = "Victoria"; // Escena cuando ganas
-    public string loseSceneName = "Derrota"; // Escena cuando pierdes
+    public string winSceneName = "Victoria";
+    public string loseSceneName = "Derrota";
 
     [Header("Game Manager Integration")]
-    public bool useGameManager = true; // Si usas el GameManager
+    public bool useGameManager = true;
 
     private bool isInTrigger = false;
     public float reducedPushBackFactor = 0.5f;
@@ -38,17 +51,24 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         _compRigidbody = GetComponent<Rigidbody>();
+        if (_compRigidbody == null)
+        {
+            Debug.LogError("Rigidbody no encontrado en: " + gameObject.name);
+        }
     }
-
     private void Start()
     {
         OriginalSpeed = moveSpeed;
-        maxLife = Life; // Guardar vida máxima
+        maxLife = Life;
 
-        if (OnPlayerInstantiated != null)
+        // REEMPLAZA con el nuevo método no obsoleto
+        GameManager gm = FindFirstObjectByType<GameManager>();
+        if (gm != null)
         {
-            OnPlayerInstantiated(this);
+            gm.OnPlayerInstantiated(this);
         }
+
+        OnLifeChanged?.Invoke(Life);
     }
 
     void Update()
@@ -73,40 +93,39 @@ public class PlayerController : MonoBehaviour
 
     void HandleDefeat()
     {
-        if (useGameManager && GameManager.Instance != null)
+        Debug.Log($"Jugador {playerNumber} derrotado!");
+
+       
+        GameManager gm = FindFirstObjectByType<GameManager>();
+        if (useGameManager && gm != null)
         {
-            // Notificar al GameManager que este jugador fue eliminado
-            GameManager.Instance.OnPlayerEliminated(this);
+            gm.OnPlayerEliminated(this);
         }
         else
         {
+            
             SceneManager.LoadScene(loseSceneName);
         }
 
-        // Desactivar controles pero mantener visible
         enabled = false;
         GetComponent<Collider>().enabled = false;
-
-        // Efecto visual de eliminación
         StartCoroutine(EliminationEffect());
     }
 
     public void OnEnemyDestroyed()
     {
-        if (useGameManager && GameManager.Instance != null)
+        if (useGameManager)
         {
-            // El GameManager maneja la victoria global
             return;
         }
         else
         {
-            // Victoria directa si no hay GameManager
             SceneManager.LoadScene(winSceneName);
         }
     }
+
     IEnumerator EliminationEffect()
     {
-        // Parpadeo y efecto de eliminación
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
         float effectTime = 2f;
         float elapsed = 0f;
@@ -126,33 +145,19 @@ public class PlayerController : MonoBehaviour
             r.enabled = false;
         }
     }
+
     public void TakeDamage(float damage)
     {
+        Debug.Log($"Jugador {playerNumber} recibe {damage} de daño");
         Life -= damage;
-        Life = Mathf.Clamp(Life, 0, maxLife);
-
-        // Notificar cambio de vida
-        if (OnLifeChanged != null)
-        {
-            OnLifeChanged(Life);
-        }
-
-        // Si usas GameManager, notificar daño
-
     }
 
     public void Heal(float healAmount)
     {
+        Debug.Log($"Jugador {playerNumber} recibe {healAmount} de curación");
         Life += healAmount;
-        Life = Mathf.Clamp(Life, 0, maxLife);
-
-        if (OnLifeChanged != null)
-        {
-            OnLifeChanged(Life);
-        }
     }
 
-    // Resto de tus métodos existentes...
     void MoveTank(float input)
     {
         Vector3 forwardMovement = transform.forward * input * moveSpeed;
@@ -201,7 +206,6 @@ public class PlayerController : MonoBehaviour
     {
         if (other.CompareTag("EnemyBullet"))
         {
-            // Recibir daño de bala enemiga
             EnemyBullet bullet = other.GetComponent<EnemyBullet>();
             if (bullet != null)
             {
@@ -209,7 +213,6 @@ public class PlayerController : MonoBehaviour
             }
             Destroy(other.gameObject);
         }
-
         else if (other.CompareTag("PushBackReducer"))
         {
             isInTrigger = true;
@@ -228,7 +231,6 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            // Daño por colisión con enemigo
             TakeDamage(2f);
         }
     }
