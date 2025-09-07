@@ -6,11 +6,14 @@ TagManager:
   tags:
   - Enemy
   - Bullet
+  - PushBackReducer
+  - EnemyBullet
+  - Ground
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
   - 

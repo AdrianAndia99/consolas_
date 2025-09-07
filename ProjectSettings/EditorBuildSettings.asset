@@ -9,12 +9,26 @@ EditorBuildSettings:
     path: Assets/FPS/Scenes/IntroMenu.unity
     guid: 56e3faabc5bb30f49a68bb8f1292f988
   - enabled: 1
+    path: Assets/FPS/Scenes/WinSceneTwoPlayer.unity
+    guid: 21d2dc5aff2b7b94a86a3aced3cbbc0d
+  - enabled: 1
     path: Assets/FPS/Scenes/WinScene.unity
     guid: 037d06fbede2b4041a843d9ee6fe750c
   - enabled: 1
     path: Assets/FPS/Scenes/LoseScene.unity
     guid: 72e5c65a45893714484002914e3fd521
   - enabled: 1
+    path: Assets/FPS/Scenes/LoseSceneTwoPlayer.unity
+    guid: bc62379ed2a464b41989b2cf9c01084f
+  - enabled: 1
     path: Assets/FPS/Scenes/MainScene.unity
     guid: d794a2ef8ba31d847ad3c19d03e2ddb9
-  m_configObjects: {}
+  - enabled: 1
+    path: Assets/FPS/Scenes/MainSceneTwoPlayer.unity
+    guid: b56f724372ce30a4a82a9d51099bcc80
+  m_configObjects:
+    com.unity.input.settings: {fileID: 11400000, guid: e9ea28b1463334048b13357d48366114,
+      type: 2}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 342bbd3fe97707449955260db9399598,
+      type: 3}
+  m_UseUCBPForAssetBundles: 0
