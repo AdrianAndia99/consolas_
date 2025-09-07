@@ -263,7 +263,7 @@ public class GameManager : MonoBehaviour
 
     void SpawnEnemy()
     {
-        if (spawnPoints.Length > 0 && enemyPrefab != null)
+        if (spawnPoints.Length > 0 && enemyPrefab != null && totalEnemies < 4)
         {
             Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
             GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
