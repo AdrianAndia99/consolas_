@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using TMPro.EditorUtilities;
+
 public class GamepadWaitScreen : MonoBehaviour
 {
     public GameObject waitScreen;
