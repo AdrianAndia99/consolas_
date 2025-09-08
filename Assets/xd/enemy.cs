@@ -1,65 +1,66 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
+using UnityEngine.AI;
 
 public class enemy : MonoBehaviour
 {
-    [Header("Movement Settings")]
-    public float patrolSpeed = 2f;
-    public float chaseSpeed = 4f;
+    [Header("Settings")]
     public float detectionRange = 10f;
     public float attackRange = 7f;
     public float patrolRange = 15f;
 
-    [Header("Shooting Settings")]
+    [Header("Shooting")]
     public GameObject bulletPrefab;
     public Transform firePoint;
     public float fireRate = 2f;
     public float bulletSpeed = 15f;
 
-    [Header("Patrol Settings")]
-    public float minPatrolTime = 2f;
-    public float maxPatrolTime = 5f;
-
-    private Transform player;
+    private Transform[] players;
+    private Transform currentTarget;
     private Vector3 patrolCenter;
-    private Vector3 targetPosition;
     private float nextFireTime;
-    private float patrolTimer;
-    private bool isChasing = false;
-    private bool isAttacking = false;
+    private NavMeshAgent agent;
 
     void Start()
     {
-        // Buscar al jugador (asumiendo que tiene el tag "Player")
-        player = GameObject.FindGameObjectWithTag("PushBackReducer").transform;
+        agent = GetComponent<NavMeshAgent>();
+
+        GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("PushBackReducer");
+        players = new Transform[playerObjects.Length];
+        for (int i = 0; i < playerObjects.Length; i++)
+            players[i] = playerObjects[i].transform;
 
         patrolCenter = transform.position;
         ChooseNewPatrolPoint();
+
+        StartCoroutine(UpdateTargetCoroutine());
     }
 
     void Update()
     {
-        if (player != null)
+        if (currentTarget != null)
         {
-            float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+            float distance = Vector3.Distance(transform.position, currentTarget.position);
 
-            if (distanceToPlayer <= attackRange && !isAttacking)
+            if (distance <= attackRange)
             {
-                StartAttacking();
-            }
-            else if (distanceToPlayer <= detectionRange && distanceToPlayer > attackRange)
-            {
-                ChasePlayer();
-            }
-            else if (distanceToPlayer > detectionRange && isChasing)
-            {
-                StopChasing();
-            }
+                agent.isStopped = true; 
+                transform.LookAt(currentTarget);
 
-            if (isAttacking && Time.time >= nextFireTime)
+                if (Time.time >= nextFireTime)
+                {
+                    Shoot();
+                    nextFireTime = Time.time + fireRate;
+                }
+            }
+            else if (distance <= detectionRange)
             {
-                Shoot();
-                nextFireTime = Time.time + fireRate;
+                agent.isStopped = false;
+                agent.SetDestination(currentTarget.position); 
+            }
+            else
+            {
+                Patrol();
             }
         }
         else
@@ -68,86 +69,59 @@ public class enemy : MonoBehaviour
         }
     }
 
+    IEnumerator UpdateTargetCoroutine()
+    {
+        while (true)
+        {
+            UpdateTarget();
+            yield return new WaitForSeconds(1f);
+        }
+    }
+
+    void UpdateTarget()
+    {
+        Transform closest = null;
+        float minDist = Mathf.Infinity;
+
+        foreach (Transform player in players)
+        {
+            if (player == null) continue;
+
+            float dist = Vector3.Distance(transform.position, player.position);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                closest = player;
+            }
+        }
+
+        currentTarget = closest;
+    }
+
     void Patrol()
     {
-        patrolTimer -= Time.deltaTime;
-
-        if (patrolTimer <= 0f)
-        {
+        if (!agent.hasPath || agent.remainingDistance < 0.5f)
             ChooseNewPatrolPoint();
-        }
-
-        // Movimiento hacia el punto de patrulla
-        Vector3 direction = (targetPosition - transform.position).normalized;
-        direction.y = 0; // Mantener movimiento horizontal
-
-        transform.position = Vector3.MoveTowards(transform.position,
-            new Vector3(targetPosition.x, transform.position.y, targetPosition.z),
-            patrolSpeed * Time.deltaTime);
-
-        // Rotación hacia la dirección del movimiento
-        if (direction != Vector3.zero)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 2f);
-        }
     }
 
     void ChooseNewPatrolPoint()
     {
-        // Elegir un punto aleatorio dentro del rango de patrulla
-        Vector2 randomCircle = Random.insideUnitCircle * patrolRange;
-        targetPosition = patrolCenter + new Vector3(randomCircle.x, 0, randomCircle.y);
-        patrolTimer = Random.Range(minPatrolTime, maxPatrolTime);
-    }
-
-    void ChasePlayer()
-    {
-        isChasing = true;
-        isAttacking = false;
-
-        if (player != null)
-        {
-            Vector3 direction = (player.position - transform.position).normalized;
-            direction.y = 0;
-
-            transform.position = Vector3.MoveTowards(transform.position,
-                new Vector3(player.position.x, transform.position.y, player.position.z),
-                chaseSpeed * Time.deltaTime);
-
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 3f);
-        }
-    }
-
-    void StartAttacking()
-    {
-        isChasing = false;
-        isAttacking = true;
-        // El enemigo se queda en su posición mientras dispara
-    }
-
-    void StopChasing()
-    {
-        isChasing = false;
-        isAttacking = false;
-        patrolCenter = transform.position; // Establecer nuevo centro de patrulla
-        ChooseNewPatrolPoint();
+        Vector2 rnd = Random.insideUnitCircle * patrolRange;
+        Vector3 patrolPoint = patrolCenter + new Vector3(rnd.x, 0, rnd.y);
+        agent.SetDestination(patrolPoint);
     }
 
     void Shoot()
     {
-        if (bulletPrefab != null && firePoint != null && player != null)
+        if (bulletPrefab != null && firePoint != null && currentTarget != null)
         {
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-            Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
-
-            if (bulletRb != null)
+            Rigidbody rb = bullet.GetComponent<Rigidbody>();
+            if (rb != null)
             {
-                Vector3 shootDirection = (player.position - firePoint.position).normalized;
-                bulletRb.linearVelocity = shootDirection * bulletSpeed;
+                Vector3 dir = (currentTarget.position - firePoint.position).normalized;
+                rb.linearVelocity = dir * bulletSpeed;
             }
-
             Destroy(bullet, 5f);
         }
     }
@@ -156,20 +130,8 @@ public class enemy : MonoBehaviour
     {
         if (other.CompareTag("Bullet"))
         {
-            Destroy(other.gameObject);
             Destroy(gameObject);
+            Destroy(other.gameObject);
         }
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectionRange);
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(patrolCenter, patrolRange);
     }
 }

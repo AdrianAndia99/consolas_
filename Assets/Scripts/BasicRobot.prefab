@@ -5209,6 +5209,7 @@ GameObject:
   - component: {fileID: 4067074299177369215}
   - component: {fileID: 144039828222190473}
   - component: {fileID: -4515807441650551202}
+  - component: {fileID: 7832183591545263012}
   m_Layer: 0
   m_Name: BasicRobot
   m_TagString: Enemy
@@ -5270,7 +5271,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5ce939292b7d574684bb14f7467fe3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 3
   patrolSpeed: 2
   chaseSpeed: 4
   detectionRange: 10
@@ -5281,11 +5281,6 @@ MonoBehaviour:
   firePoint: {fileID: 8869302086667902671}
   fireRate: 2
   bulletSpeed: 15
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  groundCheckDistance: 0.1
-  heightOffset: 0.5
   minPatrolTime: 2
   maxPatrolTime: 5
 --- !u!65 &144039828222190473
@@ -5336,6 +5331,28 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 4
   m_CollisionDetection: 0
+--- !u!195 &7832183591545263012
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1910809731494197689}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &1959911239352254780
 GameObject:
   m_ObjectHideFlags: 0
