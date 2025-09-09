@@ -26,6 +26,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/FPS/Scenes/MainSceneTwoPlayer.unity
     guid: b56f724372ce30a4a82a9d51099bcc80
+  - enabled: 1
+    path: Assets/FPS/Scenes/MainSceneTwoPlayerEnfrentamiento.unity
+    guid: 9d9546543a8843140be713724d213425
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: e9ea28b1463334048b13357d48366114,
       type: 2}
