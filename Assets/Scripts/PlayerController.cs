@@ -48,6 +48,8 @@ public class PlayerController : MonoBehaviour
     public static event Action<PlayerController> OnPlayerInstantiated;
     public event Action<float> OnLifeChanged;
 
+    [SerializeField] private bool isCompetitive;
+
     void Awake()
     {
         _compRigidbody = GetComponent<Rigidbody>();
@@ -216,6 +218,10 @@ public class PlayerController : MonoBehaviour
         else if (other.CompareTag("PushBackReducer"))
         {
             isInTrigger = true;
+        }
+        else if (other.CompareTag("Bullet")&& isCompetitive)
+        {
+            --_life;
         }
     }
 

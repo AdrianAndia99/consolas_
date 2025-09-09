@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
 public class ShootPlayerController : MonoBehaviour
 {
+
+
     public float launchSpeed = 50.0f;
     public GameObject bullet;
     private PlayerInput playerInput;

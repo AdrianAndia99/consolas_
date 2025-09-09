@@ -9,6 +9,8 @@ TagManager:
   - PushBackReducer
   - EnemyBullet
   - Ground
+  - BulletPlayer1
+  - BulletPlayer2
   layers:
   - Default
   - TransparentFX

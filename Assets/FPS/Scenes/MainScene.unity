@@ -446,7 +446,7 @@ PrefabInstance:
     - target: {fileID: 2187651940467708676, guid: 15ce35e32eea79d4888c47aa3e4154af,
         type: 3}
       propertyPath: m_DefaultActionMap
-      value: 2789a8f1-8012-488f-b84b-30c35c9902cb
+      value: "PlayerCa\xF1on"
       objectReference: {fileID: 0}
     - target: {fileID: 2187651940467708676, guid: 15ce35e32eea79d4888c47aa3e4154af,
         type: 3}
@@ -658,6 +658,12 @@ PrefabInstance:
       propertyPath: m_ActionEvents.Array.data[5].m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 3217157511805719974, guid: 15ce35e32eea79d4888c47aa3e4154af,
+        type: 3}
+      propertyPath: bullet
+      value: 
+      objectReference: {fileID: 589524282012236564, guid: b5b7a1329da8ddb4ab02fdb1f1d1bbc2,
+        type: 3}
     - target: {fileID: 3724452246103603649, guid: 15ce35e32eea79d4888c47aa3e4154af,
         type: 3}
       propertyPath: m_Actions
