@@ -9,6 +9,7 @@ TagManager:
   - PushBackReducer
   - EnemyBullet
   - Ground
+  - PowerUp
   layers:
   - Default
   - TransparentFX

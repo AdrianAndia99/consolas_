@@ -1,8 +1,5 @@
-using DG.Tweening;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.FPS.Gameplay;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -47,6 +44,9 @@ public class PlayerController : MonoBehaviour
 
     public static event Action<PlayerController> OnPlayerInstantiated;
     public event Action<float> OnLifeChanged;
+
+    [Header("PowerUpSpeed")]
+    private Coroutine speedCoroutine;
 
     void Awake()
     {
@@ -234,4 +234,24 @@ public class PlayerController : MonoBehaviour
             TakeDamage(2f);
         }
     }
+    #region Speed
+    public void AplicarSpeed(float multiplicadorSpeed, float duraccion)
+    {
+        if (speedCoroutine != null)
+        {
+            StopCoroutine(speedCoroutine);
+            moveSpeed = OriginalSpeed;  
+        }
+
+        speedCoroutine = StartCoroutine(SpeedTime(multiplicadorSpeed, duraccion));
+    }
+
+    private IEnumerator SpeedTime(float speedMultiplier, float duration)
+    {
+        moveSpeed = OriginalSpeed * speedMultiplier;
+        yield return new WaitForSeconds(duration);
+        moveSpeed = OriginalSpeed;
+        speedCoroutine = null;
+    }
+    #endregion
 }
