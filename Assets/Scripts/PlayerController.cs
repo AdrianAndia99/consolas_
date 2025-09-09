@@ -1,8 +1,5 @@
-using DG.Tweening;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.FPS.Gameplay;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -47,8 +44,11 @@ public class PlayerController : MonoBehaviour
 
     public static event Action<PlayerController> OnPlayerInstantiated;
     public event Action<float> OnLifeChanged;
-
     [SerializeField] private bool isCompetitive;
+
+    [Header("PowerUpSpeed")]
+    private Coroutine speedCoroutine;
+
 
     void Awake()
     {
@@ -69,7 +69,7 @@ public class PlayerController : MonoBehaviour
         {
             gm.OnPlayerInstantiated(this);
         }
-
+        
         OnLifeChanged?.Invoke(Life);
     }
 
@@ -236,10 +236,27 @@ public class PlayerController : MonoBehaviour
         {
             TakeDamage(2f);
         }
-        else if (collision.gameObject.CompareTag("Bullet") && isCompetitive)
+        else if(collision.gameObject.CompareTag("Bullet")&&isCompetitive)
         {
-            Debug.LogWarning("Entro");
             --_life;
         }
+    }
+    public void AplicarSpeed(float multiplicadorSpeed, float duraccion)
+    {
+        if (speedCoroutine != null)
+        {
+            StopCoroutine(speedCoroutine);
+            moveSpeed = OriginalSpeed;
+        }
+
+        speedCoroutine = StartCoroutine(SpeedTime(multiplicadorSpeed, duraccion));
+    }
+
+    private IEnumerator SpeedTime(float speedMultiplier, float duration)
+    {
+        moveSpeed = OriginalSpeed * speedMultiplier;
+        yield return new WaitForSeconds(duration);
+        moveSpeed = OriginalSpeed;
+        speedCoroutine = null;
     }
 }
