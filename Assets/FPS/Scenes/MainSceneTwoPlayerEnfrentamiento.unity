@@ -5041,15 +5041,15 @@ MonoBehaviour:
   scorePerSecond: 10
   winScene: WinSceneTwoPlayer
   loseScene: LoseSceneTwoPlayer
-  timeTextP1: {fileID: 2138008793}
-  scoreTextP1: {fileID: 2136334982}
-  enemiesTextP1: {fileID: 1504006706}
-  healthTextP1: {fileID: 1663667534}
+  timeTextP1: {fileID: 0}
+  scoreTextP1: {fileID: 0}
+  enemiesTextP1: {fileID: 0}
+  healthTextP1: {fileID: 0}
   eliminatedPanelP1: {fileID: 308302797}
-  timeTextP2: {fileID: 385109032}
-  scoreTextP2: {fileID: 852125773}
-  enemiesTextP2: {fileID: 1618260002}
-  healthTextP2: {fileID: 1647558303}
+  timeTextP2: {fileID: 0}
+  scoreTextP2: {fileID: 0}
+  enemiesTextP2: {fileID: 0}
+  healthTextP2: {fileID: 0}
   eliminatedPanelP2: {fileID: 535965417}
   gameOverPanel: {fileID: 192269749}
   gameOverText: {fileID: 1159771398}

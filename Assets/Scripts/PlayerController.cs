@@ -1,3 +1,5 @@
+using DG.Tweening;
+using UnityEngine.UI;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -13,6 +15,8 @@ public class PlayerController : MonoBehaviour
     public GameObject[] leftWheels;
     public GameObject[] rightWheels;
     public int playerNumber = 0;
+    [Header("UI")]
+    public Slider lifeSlider; // Asigna el slider correspondiente en el inspector
 
     // Cambiamos a propiedad con backing field
     private float _life = 10f;
@@ -56,6 +60,14 @@ public class PlayerController : MonoBehaviour
         if (_compRigidbody == null)
         {
             Debug.LogError("Rigidbody no encontrado en: " + gameObject.name);
+        }
+        OnLifeChanged += UpdateLifeSlider;
+    }
+    void UpdateLifeSlider(float currentLife)
+    {
+        if (lifeSlider != null)
+        {
+            lifeSlider.value = currentLife / maxLife;
         }
     }
     private void Start()
@@ -238,7 +250,7 @@ public class PlayerController : MonoBehaviour
         }
         else if(collision.gameObject.CompareTag("Bullet")&&isCompetitive)
         {
-            --_life;
+            --Life;
         }
     }
     public void AplicarSpeed(float multiplicadorSpeed, float duraccion)
