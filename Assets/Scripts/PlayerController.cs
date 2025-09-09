@@ -219,10 +219,7 @@ public class PlayerController : MonoBehaviour
         {
             isInTrigger = true;
         }
-        else if (other.CompareTag("Bullet")&& isCompetitive)
-        {
-            --_life;
-        }
+        
     }
 
     private void OnTriggerExit(Collider other)
@@ -238,6 +235,11 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Enemy"))
         {
             TakeDamage(2f);
+        }
+        else if (collision.gameObject.CompareTag("Bullet") && isCompetitive)
+        {
+            Debug.LogWarning("Entro");
+            --_life;
         }
     }
 }
