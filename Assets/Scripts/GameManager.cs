@@ -4,6 +4,7 @@ using Unity.FPS.AI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -18,17 +19,17 @@ public class GameManager : MonoBehaviour
     public string loseScene;
 
     [Header("UI References - Player 1")]
-    public Text timeTextP1;
-    public Text scoreTextP1;
-    public Text enemiesTextP1;
-    public Text healthTextP1;
+    public TMP_Text timeTextP1;
+    public TMP_Text scoreTextP1;
+    public TMP_Text enemiesTextP1;
+    public TMP_Text healthTextP1;
     public GameObject eliminatedPanelP1;
 
     [Header("UI References - Player 2")]
-    public Text timeTextP2;
-    public Text scoreTextP2;
-    public Text enemiesTextP2;
-    public Text healthTextP2;
+    public TMP_Text timeTextP2;
+    public TMP_Text scoreTextP2;
+    public TMP_Text enemiesTextP2;
+    public TMP_Text healthTextP2;
     public GameObject eliminatedPanelP2;
 
     [Header("Global UI")]
