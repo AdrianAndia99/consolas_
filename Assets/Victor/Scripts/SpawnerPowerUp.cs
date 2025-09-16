@@ -1,10 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 public class SpawnerPowerUp : MonoBehaviour
 {
     public GameObject[] powerUps;      
-    public Transform[] spawnPoints;      
     public float spawnInterval = 3f;     
 
     void Start()
@@ -20,41 +19,25 @@ public class SpawnerPowerUp : MonoBehaviour
             yield return new WaitForSeconds(spawnInterval);
         }
     }
-
-    void SpawnOnePowerUp()
+    
+    private void SpawnOnePowerUp()
     {
-        List<Transform> puntosLibres = new List<Transform>();
+        Vector3 position = GetRandomPosition();
+        Instantiate(powerUps[Random.Range(0,powerUps.Length)],
+            new Vector3(position.x,1.3f,position.z), Quaternion.identity);
+    }
+    private Vector3 GetRandomPosition()
+    {
+        Vector3 randomDirection = Random.insideUnitSphere * 50;
+        print(randomDirection);
+        randomDirection += transform.position;
+        print(randomDirection);
 
-        for (int i = 0; i < spawnPoints.Length; i++)
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(randomDirection, out hit, 100, NavMesh.AllAreas))
         {
-            Collider[] colliderOcupado = Physics.OverlapSphere(spawnPoints[i].position, 0.5f);
-            bool ocupado = false;
-
-            for (int j = 0; j < colliderOcupado.Length; j++)
-            {
-                if (colliderOcupado[j].CompareTag("PowerUp"))
-                {
-                    ocupado = true;
-                    break;
-                }
-            }
-
-            if (!ocupado)
-            {
-                puntosLibres.Add(spawnPoints[i]);
-            }
+            return hit.position;
         }
-
-        if (puntosLibres.Count == 0)
-        {
-            return;
-        }
-
-        int randomIndex = Random.Range(0, puntosLibres.Count);
-        Transform spawnPoint = puntosLibres[randomIndex];
-
-        int randomPowerIndex = Random.Range(0, powerUps.Length);
-
-        Instantiate(powerUps[randomPowerIndex], spawnPoint.position, Quaternion.identity);
+        return transform.position;
     }
 }

@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour
     public Text gameOverText;
 
     [Header("Enemy Spawn Settings")]
+    [SerializeField] private bool isCombat;
     public GameObject enemyPrefab;
     public int maxEnemies = 10;
     public float spawnInterval = 5f;
@@ -53,46 +54,36 @@ public class GameManager : MonoBehaviour
 
 
 
-    // NUEVO MÉTODO: Se llama cuando una escena se carga
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Debug.Log($"Escena cargada: {scene.name}");
         ResetGameState();
     }
 
-    // NUEVO MÉTODO: Reiniciar el estado del juego
     void ResetGameState()
     {
-        Debug.Log("Reiniciando estado del juego");
 
-        // Limpiar todas las listas
         activePlayers.Clear();
         eliminatedPlayers.Clear();
         activeEnemies.Clear();
 
-        // Reiniciar variables de estado
         currentTime = matchTime;
         currentScore = 0;
         enemiesDestroyed = 0;
         totalEnemies = 0;
         gameEnded = false;
 
-        // Ocultar paneles de eliminación
         HideAllEliminatedPanels();
 
-        // Ocultar panel de game over
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(false);
         }
 
-        Debug.Log("Estado del juego reiniciado");
         UpdateUI();
     }
 
     void Start()
     {
-        // Buscar jugadores existentes al inicio
         FindExistingPlayers();
         currentTime = matchTime;
         UpdateUI();
@@ -101,7 +92,6 @@ public class GameManager : MonoBehaviour
     }
     void FindExistingPlayers()
     {
-        // REEMPLAZA con el nuevo método no obsoleto
         PlayerController[] players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
         foreach (PlayerController player in players)
         {
@@ -114,7 +104,6 @@ public class GameManager : MonoBehaviour
         PlayerController.OnPlayerInstantiated -= OnPlayerInstantiated;
         UnsubscribeAllPlayers();
 
-        // Desuscribir del evento de escena
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
@@ -152,19 +141,14 @@ public class GameManager : MonoBehaviour
 
     public void OnPlayerInstantiated(PlayerController player)
     {
-        Debug.Log($"Jugador {player.playerNumber} instanciado");
 
-        // Limpiar jugadores null o duplicados
         activePlayers.RemoveAll(p => p == null || p == player);
 
-        // Desuscribir primero por si ya estaba suscrito
         player.OnLifeChanged -= OnPlayerLifeChanged;
 
-        // Suscribir al evento de vida
         player.OnLifeChanged += OnPlayerLifeChanged;
         player.useGameManager = true;
 
-        // Asignar número de jugador si no tiene o está duplicado
         if (player.playerNumber == 0 || PlayerNumberExists(player.playerNumber))
         {
             player.playerNumber = GetNextAvailablePlayerNumber();
@@ -172,11 +156,9 @@ public class GameManager : MonoBehaviour
 
         activePlayers.Add(player);
 
-        Debug.Log($"Jugador {player.playerNumber} agregado. Total: {activePlayers.Count}");
         UpdateUI();
     }
 
-    // NUEVO MÉTODO: Verificar si un número de jugador ya existe
     bool PlayerNumberExists(int playerNumber)
     {
         foreach (PlayerController p in activePlayers)
@@ -189,7 +171,6 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    // NUEVO MÉTODO: Obtener el siguiente número de jugador disponible
     int GetNextAvailablePlayerNumber()
     {
         for (int i = 1; i <= 2; i++)
@@ -204,7 +185,6 @@ public class GameManager : MonoBehaviour
 
     void OnPlayerLifeChanged(float newLife)
     {
-        Debug.Log($"Evento OnPlayerLifeChanged recibido: {newLife}");
         UpdateUI();
     }
 
@@ -243,7 +223,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator SpawnEnemiesCoroutine()
     {
-        while (!gameEnded)
+        while (!gameEnded && !isCombat)
         {
             if (activeEnemies.Count < maxEnemies)
             {
@@ -296,7 +276,6 @@ public class GameManager : MonoBehaviour
         // Limpiar jugadores null antes de actualizar UI
         activePlayers.RemoveAll(p => p == null);
 
-        Debug.Log($"UpdateUI - Jugadores activos: {activePlayers.Count}");
 
         // Tiempo
         string timeString = $"Tiempo: {Mathf.FloorToInt(currentTime / 60f):00}:{Mathf.FloorToInt(currentTime % 60f):00}";
