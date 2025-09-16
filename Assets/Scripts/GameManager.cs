@@ -52,35 +52,22 @@ public class GameManager : MonoBehaviour
     private List<PlayerController> activePlayers = new List<PlayerController>();
     private List<PlayerController> eliminatedPlayers = new List<PlayerController>();
 
+    [Header("Victory Panel Settings")]
+    public GameObject victoryPanelP1;
+    public GameObject victoryPanelP2;
+    public Button restartButtonP1;
+    public Button restartButtonP2;
+    public Button menuButtonP1;
+    public Button menuButtonP2;
 
+    private bool playerVictory = false;
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         ResetGameState();
     }
 
-    void ResetGameState()
-    {
 
-        activePlayers.Clear();
-        eliminatedPlayers.Clear();
-        activeEnemies.Clear();
-
-        currentTime = matchTime;
-        currentScore = 0;
-        enemiesDestroyed = 0;
-        totalEnemies = 0;
-        gameEnded = false;
-
-        HideAllEliminatedPanels();
-
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(false);
-        }
-
-        UpdateUI();
-    }
 
     void Start()
     {
@@ -89,6 +76,7 @@ public class GameManager : MonoBehaviour
         UpdateUI();
         StartCoroutine(SpawnEnemiesCoroutine());
         StartCoroutine(ScoreOverTimeCoroutine());
+        SetupVictoryPanelButtons();
     }
     void FindExistingPlayers()
     {
@@ -105,6 +93,18 @@ public class GameManager : MonoBehaviour
         UnsubscribeAllPlayers();
 
         SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    void SetupVictoryPanelButtons()
+    {
+        if (restartButtonP1 != null)
+            restartButtonP1.onClick.AddListener(RestartGame);
+        if (restartButtonP2 != null)
+            restartButtonP2.onClick.AddListener(RestartGame);
+
+        if (menuButtonP1 != null)
+            menuButtonP1.onClick.AddListener(GoToMainMenu);
+        if (menuButtonP2 != null)
+            menuButtonP2.onClick.AddListener(GoToMainMenu);
     }
 
     void UnsubscribeAllPlayers()
@@ -188,20 +188,7 @@ public class GameManager : MonoBehaviour
         UpdateUI();
     }
 
-    public void OnPlayerEliminated(PlayerController player)
-    {
-        if (!eliminatedPlayers.Contains(player))
-        {
-            Debug.Log($"Jugador {player.playerNumber} eliminado");
-            eliminatedPlayers.Add(player);
-            ShowEliminatedPanel(player.playerNumber);
 
-            if (eliminatedPlayers.Count >= activePlayers.Count)
-            {
-                EndGame(false);
-            }
-        }
-    }
 
     void ShowEliminatedPanel(int playerNumber)
     {
@@ -357,9 +344,96 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(sceneName);
     }
 
+    public void GoToMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenu"); // Cambia "MainMenu" por el nombre de tu escena de menú
+    }
+
+    public void OnPlayerEliminated(PlayerController player)
+    {
+        if (!eliminatedPlayers.Contains(player))
+        {
+            Debug.Log($"Jugador {player.playerNumber} eliminado");
+            eliminatedPlayers.Add(player);
+            ShowEliminatedPanel(player.playerNumber);
+
+            // Verificar si queda solo un jugador en pie
+            if (activePlayers.Count - eliminatedPlayers.Count == 1 && activePlayers.Count >= 2)
+            {
+                // Encontrar al jugador ganador
+                PlayerController winner = activePlayers.Find(p => !eliminatedPlayers.Contains(p));
+                if (winner != null)
+                {
+                    ShowVictoryPanel(winner.playerNumber);
+                    playerVictory = true;
+                }
+            }
+
+            if (eliminatedPlayers.Count >= activePlayers.Count && !playerVictory)
+            {
+                EndGame(false);
+            }
+        }
+    }
+
+    void ShowVictoryPanel(int winnerPlayerNumber)
+    {
+        gameEnded = true;
+
+        // Detener el tiempo del juego
+        Time.timeScale = 0f;
+
+        // Mostrar el panel correspondiente al jugador ganador
+        if (winnerPlayerNumber == 1 && victoryPanelP1 != null)
+        {
+            victoryPanelP1.SetActive(true);
+        }
+        else if (winnerPlayerNumber == 2 && victoryPanelP2 != null)
+        {
+            victoryPanelP2.SetActive(true);
+        }
+
+        Debug.Log($"¡Jugador {winnerPlayerNumber} es el ganador!");
+    }
+
+    void ResetGameState()
+    {
+        activePlayers.Clear();
+        eliminatedPlayers.Clear();
+        activeEnemies.Clear();
+
+        currentTime = matchTime;
+        currentScore = 0;
+        enemiesDestroyed = 0;
+        totalEnemies = 0;
+        gameEnded = false;
+        playerVictory = false;
+
+        HideAllEliminatedPanels();
+        HideAllVictoryPanels();
+
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(false);
+        }
+
+        // Reanudar el tiempo del juego
+        Time.timeScale = 1f;
+
+        UpdateUI();
+    }
+
+    void HideAllVictoryPanels()
+    {
+        if (victoryPanelP1 != null) victoryPanelP1.SetActive(false);
+        if (victoryPanelP2 != null) victoryPanelP2.SetActive(false);
+    }
+
     public void RestartGame()
     {
         HideAllEliminatedPanels();
+        HideAllVictoryPanels();
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
