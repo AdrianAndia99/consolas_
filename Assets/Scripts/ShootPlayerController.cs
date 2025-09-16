@@ -16,6 +16,9 @@ public class ShootPlayerController : MonoBehaviour
     private PlayerInput playerInput;
     private SpenController cannonController;
 
+    [Header("Bullet")]
+    [SerializeField] private int numBullet;
+
     void Start()
     {
         playerInput = GetComponent<PlayerInput>();
@@ -43,7 +46,7 @@ public class ShootPlayerController : MonoBehaviour
 
     public void OnShoot(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed&&numBullet>0)
         {
             SpawnBullet();
         }
@@ -51,10 +54,10 @@ public class ShootPlayerController : MonoBehaviour
 
     void SpawnBullet()
     {
+        --numBullet;
         Vector3 spawnPosition = transform.position;
         Quaternion spawnRotation = transform.rotation;
 
-        // Calcular dirección basada en la rotación del cañón
         Vector3 launchDirection = transform.forward;
         Vector3 velocity = launchDirection * launchSpeed;
 
@@ -71,10 +74,8 @@ public class ShootPlayerController : MonoBehaviour
 
     void Update()
     {
-        // Actualizar visualización de trayectoria
         UpdateTrajectoryVisualization();
 
-        // Tecla alternativa para testing
         if (Input.GetKeyDown(KeyCode.RightShift))
         {
             SpawnBullet();
@@ -112,7 +113,10 @@ public class ShootPlayerController : MonoBehaviour
             }
         }
     }
-
+    public void UpdateBullet()
+    {
+        this.numBullet = 20;
+    }
     void OnDrawGizmos()
     {
         // Visualización alternativa con Gizmos

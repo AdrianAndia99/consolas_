@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 355366571231119136}
   - component: {fileID: 8764308432068597473}
   - component: {fileID: -4098107074919778095}
+  - component: {fileID: -3696535530419712119}
   m_Layer: 0
   m_Name: PowerUp-Municion
   m_TagString: PowerUp
@@ -151,3 +152,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   floatAmplitude: 0.07
   floatFrequency: 1
+--- !u!114 &-3696535530419712119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1108625801608724982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d61652adad519b428072553e909ba00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numBullet: 5
